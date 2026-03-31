@@ -1,0 +1,26 @@
+{
+  "name": "route-optimizer",
+  "version": "1.0.0",
+  "description": "Route Optimizer — frontend tests",
+  "private": true,
+  "scripts": {
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/frontend/__tests__/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "frontend/script.js"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ]
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

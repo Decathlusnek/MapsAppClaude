@@ -1,0 +1,51 @@
+# ── OS / Editor ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# ── Environment / Secrets ─────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Python ────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+backend/.venv/
+backend/venv/
+backend/.pytest_cache/
+backend/htmlcov/
+backend/.coverage
+backend/coverage.xml
+*.egg-info/
+dist/
+build/
+
+# ── Node ──────────────────────────────────────────────────────────────
+node_modules/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Firebase ──────────────────────────────────────────────────────────
+.firebase/
+firebase-debug.log
+ui-debug.log
+firestore-debug.log
+database-debug.log
+
+# ── Docker ────────────────────────────────────────────────────────────
+.dockerignore.local
+
+# ── GitHub Actions ────────────────────────────────────────────────────
+# (keep workflows, just exclude local runner artifacts)
+.act/
