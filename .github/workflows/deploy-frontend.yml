@@ -77,3 +77,11 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPSAPP }}
           projectId: mapsapp-route-optimizer
           channelId: live
+          
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: meu-app-python-js
+          region: us-central1
+          source: ./
+          flags: '--min-instances=0 --max-instances=5 --memory=512MiB --cpu=1 --no-cpu-throttling'
