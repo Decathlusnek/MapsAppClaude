@@ -142,7 +142,7 @@ Go to **APIs & Services → Library** and enable these three APIs one by one:
 |---|---|
 | **Maps JavaScript API** | Renders the interactive map in the browser |
 | **Geocoding API** | Converts address text → lat/lng coordinates |
-| **Routes API** | Computes traffic-aware travel time matrix between all stops |
+| **Routes API (v2)** | Computes traffic-aware travel time matrix between all stops (successor to Distance Matrix API) |
 
 For each one:
 1. Search for the API name in the library search box.
@@ -175,7 +175,7 @@ For each one:
 
 Click **Save**.
 
-> ⚠️ **Never commit your API key to GitHub.** The key is entered by users in the web UI's password field and is passed to the backend per-request. It is never stored anywhere.
+> ⚠️ **Never commit your API key to GitHub.** The key is now primarily handled via the `MAPS_API_KEY` environment variable in the backend. The frontend field is an optional fallback for development.
 
 ### 5e. Add the Key to the Frontend
 
@@ -187,7 +187,14 @@ src="https://maps.googleapis.com/maps/api/js?key=YOUR_MAPS_API_KEY&libraries=pla
 
 Replace `YOUR_MAPS_API_KEY` with your actual key.
 
-> ℹ️ For production, consider storing the key as an environment variable injected during the CI/CD build step instead of hardcoding it. For a beginner setup, putting it directly in the HTML is fine as long as you restrict it to your domain.
+### 5f. Set the Backend Environment Variable (Recommended)
+
+For production (Cloud Run), it is highly recommended to set the `MAPS_API_KEY` environment variable. This ensures the key is never transmitted from the client to the server for optimization requests.
+
+- **Local**: Create a `.env` file in the `backend/` directory or export it in your shell: `export MAPS_API_KEY=AIza...`
+- **Cloud Run**: Go to the Cloud Run console → Edit & Deploy New Revision → Variables & Secrets → Add Variable `MAPS_API_KEY`.
+
+---
 
 ---
 
@@ -466,15 +473,7 @@ After 5 seconds (configurable), the solver returns **the best order it found**.
 
 ### The Cost Matrix
 
-Before solving, the backend calls the **Google Routes API — Compute Route Matrix**. This returns a table like:
-
-|  | Stop A | Stop B | Stop C |
-|---|---|---|---|
-| **Stop A** | 0 | 8 min | 15 min |
-| **Stop B** | 9 min | 0 | 6 min |
-| **Stop C** | 14 min | 7 min | 0 |
-
-These are **real-time, traffic-aware** durations — not straight-line distances. This is what makes the route actually useful in a city.
+These are **real-time, traffic-aware** durations provided by the **Google Routes API (v2)** — not straight-line distances. Using the modern `computeRouteMatrix` endpoint allows for higher precision and smarter routing in urban environments than the legacy Distance Matrix API.
 
 ### Why Not Just Use Google Maps Directions?
 

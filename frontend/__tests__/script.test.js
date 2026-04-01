@@ -11,6 +11,24 @@
 
 'use strict';
 
+// Mock the Google Maps API globals before importing script.js
+global.google = {
+  maps: {
+    Map: jest.fn(),
+    LatLngBounds: jest.fn(() => ({ extend: jest.fn() })),
+    Marker: jest.fn(),
+    SymbolPath: { CIRCLE: 0, FORWARD_CLOSED_ARROW: 1 },
+    Polyline: jest.fn(),
+    InfoWindow: jest.fn(),
+    Geocoder: jest.fn(),
+    GeocoderStatus: { OK: 'OK' }
+  }
+};
+
+// Mock other browser globals if needed
+global.navigator = { geolocation: { getCurrentPosition: jest.fn() } };
+global.fetch = jest.fn();
+
 // Import the exported functions from script.js
 const {
   formatDistance,

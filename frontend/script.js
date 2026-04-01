@@ -463,14 +463,12 @@ function clearWaypointMarkers() {
 
 function updateOptimizeButton() {
   const hasWaypoints = geocodedWaypoints.length > 0;
-  const hasKey = el.apiKeyInput().value.trim().length > 10;
-  const canOptimize = hasWaypoints && hasKey;
+  // We no longer strictly require a client-side key because the backend can provide one.
+  const canOptimize = hasWaypoints;
 
   el.optimizeBtn().disabled = !canOptimize;
   el.optimizeHint().textContent = !hasWaypoints
     ? 'Pin addresses on the map first.'
-    : !hasKey
-    ? 'Enter your Google Maps API key.'
     : `Ready to optimize ${geocodedWaypoints.length} stops.`;
 }
 
@@ -480,10 +478,7 @@ function updateOptimizeButton() {
 
 async function handleOptimize() {
   const apiKey = el.apiKeyInput().value.trim();
-  if (!apiKey) {
-    showToast('Please enter your Google Maps API key.', 'error');
-    return;
-  }
+  // apiKey is now optional. If empty, backend will use its own environment variable.
   if (geocodedWaypoints.length === 0) {
     showToast('No waypoints to optimize. Pin addresses first.', 'error');
     return;
@@ -494,7 +489,7 @@ async function handleOptimize() {
 
   const body = {
     waypoints: geocodedWaypoints.map(p => ({ lat: p.lat, lng: p.lng, address: p.address })),
-    api_key: apiKey,
+    api_key: apiKey || null,
     time_limit_seconds: 5,
   };
 

@@ -22,7 +22,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 from typing import Optional
+
 
 import httpx
 from ortools.constraint_solver import pywrapcp, routing_enums_pb2
@@ -50,7 +52,7 @@ def _location_to_waypoint(loc: Location) -> dict:
 
 
 async def _fetch_distance_matrix(
-    locations: list[Location], api_key: str
+    locations: list[Location], api_key: Optional[str] = None
 ) -> tuple[list[list[int]], list[list[int]]]:
     """
     Call the Routes API Compute Route Matrix endpoint.
@@ -72,9 +74,15 @@ async def _fetch_distance_matrix(
         "routingPreference": "TRAFFIC_AWARE",
         "extraComputations": ["TOLLS"],
     }
+    # Prioritize environment variable, then fall back to request parameter
+    key = os.getenv("MAPS_API_KEY", api_key)
+    if not key:
+        logger.warning("No Google Maps API key provided (env/req); using fallback.")
+        return _haversine_matrices(locations)
+
     headers = {
         "Content-Type": "application/json",
-        "X-Goog-Api-Key": api_key,
+        "X-Goog-Api-Key": key,
         "X-Goog-FieldMask": (
             "originIndex,destinationIndex,"
             "duration,distanceMeters,status"
@@ -211,6 +219,12 @@ def _run_ortools(
     while not routing.IsEnd(index):
         ordered.append(manager.IndexToNode(index))
         index = solution.Value(routing.NextVar(index))
+    
+    # Add the final node only if it's a point-to-point path (distinct end)
+    # or if the user wants the explicit closing stop.
+    final_node = manager.IndexToNode(index)
+    if end_index is not None or final_node != depot_index:
+        ordered.append(final_node)
 
     # Compute totals from the solution
     total_dur = 0

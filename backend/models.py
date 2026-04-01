@@ -28,7 +28,7 @@ class OptimizeRequest(BaseModel):
     waypoints: list[Location] = Field(..., min_length=1, max_length=25)
     start: Optional[Location] = None
     end: Optional[Location] = None
-    api_key: str = Field(..., min_length=10, description="Google Maps API key")
+    api_key: Optional[str] = Field(None, min_length=10, description="Google Maps API key (fallback if MAPS_API_KEY env is not set)")
     time_limit_seconds: int = Field(5, ge=1, le=30)
 
     @field_validator("waypoints")
